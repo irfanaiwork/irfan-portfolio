@@ -48,7 +48,11 @@ section{scroll-margin-top:84px}
 .irfanx-about-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .irfanx-about-actions .about-action{margin-top:0!important}
 .irfanx-demo-avatar{font-size:12px;font-weight:700;letter-spacing:.02em}
+/* Day 2 (2026-11-04): floating quick-contact button (scrolls to #Contact; no WhatsApp number on file, so no WhatsApp link) */
+.irfanx-float-contact{position:fixed;right:22px;bottom:22px;z-index:9999;display:flex;align-items:center;gap:8px;background:#37e0c8!important;color:#050510!important;font-weight:700;font-size:14px;line-height:1;padding:13px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.45);text-decoration:none!important}
+.irfanx-float-contact:hover{background:#5ce8d4!important}
 @media (max-width:768px){
+  .irfanx-float-contact{right:16px;bottom:16px;padding:11px 15px;font-size:13px}
   .about-root-section{padding:36px 20px 32px!important}
   .experience-section{padding:32px 16px 12px!important}
   .portfolio-root-section{padding:40px 16px!important}
@@ -158,6 +162,19 @@ section{scroll-margin-top:84px}
     wrap.appendChild(cv);
     wrap.appendChild(contact);
   }
+  function addFloatContact() {
+    if (document.querySelector('.irfanx-float-contact')) return;
+    var a = document.createElement('a');
+    a.className = 'irfanx-float-contact';
+    a.href = '#Contact';
+    a.setAttribute('aria-label', 'Start a Project — go to Contact');
+    a.innerHTML = '<span aria-hidden="true">✦</span><span>Start a Project</span>';
+    a.addEventListener('click', function (ev) {
+      var t = document.getElementById('Contact');
+      if (t) { ev.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    });
+    document.body.appendChild(a);
+  }
   function fixComments() {
     document.querySelectorAll('.contact-comment-error').forEach(function (e) { e.remove(); });
     var list = document.querySelector('.contact-comments-list');
@@ -194,7 +211,7 @@ section{scroll-margin-top:84px}
   var tries = 0;
   var iv = setInterval(function () {
     tries++;
-    fixSocials(); fixAbout(); fixComments();
+    fixSocials(); fixAbout(); fixComments(); addFloatContact();
     if (tries >= 40) clearInterval(iv);
   }, 500);
 })();
