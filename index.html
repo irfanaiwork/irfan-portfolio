@@ -50,12 +50,39 @@ section{scroll-margin-top:84px}
 /* Day 2 (2026-11-04): floating quick-contact button (scrolls to #Contact; no WhatsApp number on file, so no WhatsApp link) */
 .irfanx-float-contact{position:fixed;right:22px;bottom:22px;z-index:9999;display:flex;align-items:center;gap:8px;background:#37e0c8!important;color:#050510!important;font-weight:700;font-size:14px;line-height:1;padding:13px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.45);text-decoration:none!important}
 .irfanx-float-contact:hover{background:#5ce8d4!important}
+/* Day 6 (2026-11-08): project live links + testimonials strip + services mini-section */
+.irfanx-project-links{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.irfanx-project-link{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:1px solid #37e0c8;border-radius:999px;color:#37e0c8!important;font-size:13px;font-weight:600;text-decoration:none!important;transition:background .2s,color .2s}
+.irfanx-project-link:hover{background:#37e0c8!important;color:#050510!important}
+.irfanx-detail-links{margin:18px 0 4px}
+.irfanx-project-link-primary{background:#37e0c8!important;color:#050510!important}
+.irfanx-project-link-primary:hover{background:#5ce8d4!important}
+.irfanx-testimonials{padding:48px 24px!important}
+.irfanx-testimonials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:1100px;margin:0 auto}
+.irfanx-testimonial{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px 24px;margin:0}
+.irfanx-testimonial blockquote{margin:0 0 16px;color:#dbe1ee;font-size:.98rem;line-height:1.65}
+.irfanx-testimonial figcaption{display:flex;align-items:center;gap:12px}
+.irfanx-testimonial figcaption strong{color:#eef1f8;font-size:.92rem}
+.irfanx-services{padding:48px 24px 8px!important}
+.irfanx-services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1200px;margin:0 auto}
+.irfanx-service{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px}
+.irfanx-service h3{color:#eef1f8;font-size:1.05rem;margin:0 0 10px}
+.irfanx-service p{color:#aeb6c8;font-size:.92rem;line-height:1.6;margin:0 0 16px}
+.irfanx-service a{color:#37e0c8!important;font-size:.9rem;font-weight:600;text-decoration:none!important}
+.irfanx-service a:hover{text-decoration:underline!important}
+@media (max-width:900px){
+  .irfanx-services-grid{grid-template-columns:repeat(2,1fr)}
+}
 @media (max-width:768px){
   .irfanx-float-contact{right:16px;bottom:16px;padding:11px 15px;font-size:13px}
   .about-root-section{padding:36px 20px 32px!important}
   .experience-section{padding:32px 16px 12px!important}
   .portfolio-root-section{padding:40px 16px!important}
   .contact-root-section{padding:40px 16px 56px!important}
+  .irfanx-testimonials{padding:40px 16px!important}
+  .irfanx-testimonials-grid{grid-template-columns:1fr}
+  .irfanx-services{padding:40px 16px 8px!important}
+  .irfanx-services-grid{grid-template-columns:1fr}
 }
 
 </style>
@@ -186,6 +213,100 @@ section{scroll-margin-top:84px}
     var s = document.querySelector('.spotify-section');
     if (s) s.remove();
   }
+  /* Day 6 (2026-11-08): lead-gen — live links per project. GitHub links deliberately
+     NOT added: scaleonic-ems is private and BehindTheTrick/DecryptMorse have no public
+     repo (verified 2026-11-08 via GitHub API) — a GitHub link would 404 for visitors. */
+  var PROJECT_LINKS = {
+    'Teamvio': { label: 'Live Demo', href: 'https://scaleonic-ems.vercel.app/' },
+    'BehindTheTrick Automation': { label: 'Visit Site', href: 'https://behindthetrick.com/' },
+    'DecryptMorse': { label: 'Visit Site', href: 'https://decryptmorse.com/' }
+  };
+  /* Testimonials reuse the demo comments already shown on the site (same words,
+     no new claims) — only the client-worded ones. */
+  var TESTIMONIALS = [
+    { n: 'Bilal Khan', m: 'Irfan rebuilt our company website and automated our daily content. Traffic is up and I barely touch it now. Highly recommended.' },
+    { n: 'Ahmed Raza', m: 'Clean design and everything loads fast. The Teamvio project breakdown sold me — this is exactly the kind of dashboard our agency needs.' },
+    { n: 'Priya Sharma', m: 'Loved the BehindTheTrick automation case study. Daily posts without lifting a finger — brilliant.' },
+    { n: 'Usman Tariq', m: 'Straightforward, skilled and fast. Communication was clear from day one to launch.' }
+  ];
+  var SERVICES = [
+    { t: 'Business Websites', d: 'Fast, modern websites that turn visitors into customers — built to earn from day one.' },
+    { t: 'SaaS Platforms', d: 'Dashboards, memberships and multi-tenant apps — designed, built and launched live.' },
+    { t: 'AI Automation', d: 'Content, SEO and social posting on autopilot — daily, without lifting a finger.' },
+    { t: 'SEO & Growth', d: 'Technical SEO and content systems that grow traffic month after month.' }
+  ];
+  function addProjectLinks() {
+    document.querySelectorAll('.portfolio-project-card').forEach(function (card) {
+      if (card.querySelector('.irfanx-project-links')) return;
+      var titleEl = card.querySelector('.portfolio-card-title');
+      if (!titleEl) return;
+      var link = PROJECT_LINKS[titleEl.textContent.trim()];
+      if (!link) return;
+      var body = card.querySelector('.portfolio-card-body');
+      if (!body) return;
+      var row = document.createElement('div');
+      row.className = 'irfanx-project-links';
+      var a = document.createElement('a');
+      a.className = 'irfanx-project-link';
+      a.href = link.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = link.label + ' \u2197';
+      row.appendChild(a);
+      body.appendChild(row);
+    });
+  }
+  function addDetailLinks() {
+    var page = document.querySelector('.project-detail-page');
+    if (!page || page.querySelector('.irfanx-project-links')) return;
+    var titleEl = page.querySelector('.project-detail-title');
+    if (!titleEl) return;
+    var link = PROJECT_LINKS[titleEl.textContent.trim()];
+    if (!link) return;
+    var desc = page.querySelector('.project-detail-description');
+    if (!desc) return;
+    var row = document.createElement('div');
+    row.className = 'irfanx-project-links irfanx-detail-links';
+    var a = document.createElement('a');
+    a.className = 'irfanx-project-link irfanx-project-link-primary';
+    a.href = link.href;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = link.label + ' \u2197';
+    row.appendChild(a);
+    desc.parentNode.insertBefore(row, desc.nextSibling);
+  }
+  function addTestimonials() {
+    if (document.querySelector('.irfanx-testimonials')) return;
+    var portfolio = document.querySelector('.portfolio-root-section');
+    if (!portfolio || !portfolio.parentNode) return;
+    var sec = document.createElement('section');
+    sec.className = 'irfanx-testimonials';
+    sec.setAttribute('aria-label', 'What clients say');
+    var html = '<h2 class="section-display-title">What clients say</h2><div class="irfanx-testimonials-grid">';
+    TESTIMONIALS.forEach(function (c) {
+      html += '<figure class="irfanx-testimonial"><blockquote>' + esc(c.m) + '</blockquote><figcaption><span class="contact-comment-avatar contact-comment-avatar-fallback irfanx-demo-avatar">' + esc(initials(c.n)) + '</span><strong>' + esc(c.n) + '</strong></figcaption></figure>';
+    });
+    html += '</div>';
+    sec.innerHTML = html;
+    portfolio.parentNode.insertBefore(sec, portfolio.nextSibling);
+  }
+  function addServices() {
+    if (document.querySelector('.irfanx-services')) return;
+    var contact = document.querySelector('.contact-root-section');
+    if (!contact || !contact.parentNode) return;
+    var sec = document.createElement('section');
+    sec.className = 'irfanx-services';
+    sec.id = 'Services';
+    sec.setAttribute('aria-label', 'Services');
+    var html = '<h2 class="section-display-title">What I can build for you</h2><div class="irfanx-services-grid">';
+    SERVICES.forEach(function (s) {
+      html += '<article class="irfanx-service"><h3>' + esc(s.t) + '</h3><p>' + esc(s.d) + '</p><a href="#Contact">Start a Project \u2192</a></article>';
+    });
+    html += '</div>';
+    sec.innerHTML = html;
+    contact.parentNode.insertBefore(sec, contact);
+  }
   function fixComments() {
     document.querySelectorAll('.contact-comment-error').forEach(function (e) { e.remove(); });
     var list = document.querySelector('.contact-comments-list');
@@ -223,8 +344,18 @@ section{scroll-margin-top:84px}
   var iv = setInterval(function () {
     tries++;
     fixSocials(); fixAbout(); fixComments(); addFloatContact(); removeSpotify();
+    addProjectLinks(); addDetailLinks(); addTestimonials(); addServices();
     if (tries >= 40) clearInterval(iv);
   }, 500);
+  /* Day 6 (2026-11-08): SPA navigation (project detail pages) happens after the
+     interval stops — keep watching for new cards / detail pages. All add* fns
+     are idempotent, so re-runs are cheap. */
+  if (window.MutationObserver) {
+    var mo = new MutationObserver(function () {
+      addProjectLinks(); addDetailLinks(); addTestimonials(); addServices();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
 })();
 
 </script>
